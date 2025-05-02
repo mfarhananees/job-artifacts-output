@@ -8,10 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Get code
-        uses: actions/checkout@v4 
+        uses: actions/checkout@v3
 
       - name: setup Node JS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
           node-version: 18
       - name: Install dependencies
@@ -26,9 +26,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: get the code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
       - name: setup Node JS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
           node-version: 18
       - name: install Dependencies
@@ -39,10 +39,10 @@ jobs:
       - name: Save Job Artifacts
         uses: actions/upload-artifact@v4
         with: 
-          name: dist-files
-          path: |
-            dist
-            package.json
+          name: dist-file
+          path: dist
+           # dist
+           # package.json
   deploy:
     needs: build
     runs-on: ubuntu-latest
