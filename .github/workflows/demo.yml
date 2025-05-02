@@ -2,6 +2,7 @@ name: Deploy website
 on:
   push:
     branches:
+      - main
       - feature
 jobs:
   test:
@@ -34,4 +35,8 @@ jobs:
         run: npm ci
       - name: Build The Website
         run: npm run build
-  
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy
+        run: echo "Deploying........"
