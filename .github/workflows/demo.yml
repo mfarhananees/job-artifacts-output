@@ -39,7 +39,7 @@ jobs:
       - name: Save Job Artifacts
         uses: actions/upload-artifact@v4
         with: 
-          name: dist-file
+          name: dist-files
           path: dist
            # dist
            # package.json
@@ -50,7 +50,7 @@ jobs:
       - name: Download Build Job Artifacts
         uses: actions/download-artifact@v3
         with:
-          name: dist-file
+          name: dist-files
       - name: Output the Content of the dist folder
         run: ls
       - name: Deploy
