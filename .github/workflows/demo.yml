@@ -1,78 +1,78 @@
-name: Deploy website
-on:
-  push:
-    branches:
-      - feature
-  workflow_dispatch:    
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get code
-        uses: actions/checkout@v3
+# name: Deploy website
+# on:
+#   push:
+#     branches:
+#       - feature
+#   workflow_dispatch:    
+# jobs:
+#   test:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Get code
+#         uses: actions/checkout@v3
 
-      - name: Cashe Dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: deps-nodes-modules ${{ hashFiles('**/package-lock.json') }}
-      - name: setup Node JS
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - name: Install dependencies
-        run: npm ci
-      - name: Lint code
-        run: npm run lint
-      - name: Run tests
-        run: npm test
+#       - name: Cashe Dependencies
+#         uses: actions/cache@v4
+#         with:
+#           path: ~/.npm
+#           key: deps-nodes-modules-${{ hashFiles('**/package-lock.json') }}
+#       - name: setup Node JS
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: 18
+#       - name: Install dependencies
+#         run: npm ci
+#       - name: Lint code
+#         run: npm run lint
+#       - name: Run tests
+#         run: npm test
 
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    outputs:
-      script-file: ${{ steps.publish.outputs.script-file }}
-    steps:
-      - name: get the code
-        uses: actions/checkout@v3
+#   build:
+#     needs: test
+#     runs-on: ubuntu-latest
+#     outputs:
+#       script-file: ${{ steps.publish.outputs.script-file }}
+#     steps:
+#       - name: get the code
+#         uses: actions/checkout@v3
 
-      - name: Cashe Dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: deps-nodes-modules ${{ hashFiles('**/package-lock.json') }}  
-      - name: setup Node JS
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - name: install Dependencies
-        run: npm ci
-      - name: Build The Website
-        run: npm run build      
-      - name: Save Job Artifacts
-        uses: actions/upload-artifact@v4
-        with: 
-          name: dist-files
-          path: dist
-           # dist
-           # package.json
+#       - name: Cashe Dependencies
+#         uses: actions/cache@v4
+#         with:
+#           path: ~/.npm
+#           key: deps-nodes-modules-${{ hashFiles('**/package-lock.json') }}  
+#       - name: setup Node JS
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: 18
+#       - name: install Dependencies
+#         run: npm ci
+#       - name: Build The Website
+#         run: npm run build      
+#       - name: Save Job Artifacts
+#         uses: actions/upload-artifact@v4
+#         with: 
+#           name: dist-files
+#           path: dist
+#            # dist
+#            # package.json
 
-      - name: Publish JS File Name
-        id: publish
-        run: find dist-files/assets/*.js -type f -execdir echo 'script-file = {}' >> $GITHUB_OUTPUT ';'
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download Build Job Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: dist-files
-      - name: Output the Content of the dist folder
-        run: ls
+#       - name: Publish JS File Name
+#         id: publish
+#         run: find dist-files/assets/*.js -type f -execdir echo 'script-file={}' >> $GITHUB_OUTPUT ';'
+#   deploy:
+#     needs: build
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Download Build Job Artifacts
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: dist-files
+#       - name: Output the Content of the dist folder
+#         run: ls
 
-      - name: Output The File Name
-        run: echo "${{ needs.build.outputs.script-file }}"
-      - name: Deploy
-        run: echo "Deploying......."      
+#       - name: Output The File Name
+#         run: echo "${{ needs.build.outputs.script-file }}"
+#       - name: Deploy
+#         run: echo "Deploying......."      
         
