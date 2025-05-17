@@ -17,7 +17,7 @@ jobs:
         displayName: 'Cache Dependencies'
         inputs:
           key: 'npm | "$(Agent.OS)" | package-lock.json'
-          path: '~/.npm'
+          path: '$(HOME)/.npm'
           cacheHitVar: 'CACHE_RESTORED'
       - task: NodeTool@0
         displayName: 'Setup Node.js'
@@ -44,7 +44,7 @@ jobs:
         displayName: 'Cache Dependencies'
         inputs:
           key: 'npm | "$(Agent.OS)" | package-lock.json'
-          path: '~/.npm'
+          path: '$(HOME)/.npm'
           cacheHitVar: 'CACHE_RESTORED'
       - task: NodeTool@0
         displayName: 'Setup Node.js'
