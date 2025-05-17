@@ -1,0 +1,87 @@
+# Azure Pipelines configuration for deploying website
+trigger:
+  branches:
+    include:
+      - feature
+pr: none
+
+jobs:
+  - job: Test
+    displayName: 'Run Tests and Lint'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+      - checkout: self
+        displayName: 'Get code'
+      - task: Cache@2
+        displayName: 'Cache Dependencies'
+        inputs:
+          key: 'npm | "$(Agent.OS)" | package-lock.json'
+          path: '~/.npm'
+          cacheHitVar: 'CACHE_RESTORED'
+      - task: NodeTool@0
+        displayName: 'Setup Node.js'
+        inputs:
+          versionSpec: '18.x'
+      - script: npm ci
+        displayName: 'Install dependencies'
+      - script: npm run lint
+        displayName: 'Lint code'
+      - script: npm test
+        displayName: 'Run tests'
+
+  - job: Build
+    displayName: 'Build Website'
+    dependsOn: Test
+    pool:
+      vmImage: 'ubuntu-latest'
+    variables:
+      script-file: ''
+    steps:
+      - checkout: self
+        displayName: 'Get the code'
+      - task: Cache@2
+        displayName: 'Cache Dependencies'
+        inputs:
+          key: 'npm | "$(Agent.OS)" | package-lock.json'
+          path: '~/.npm'
+          cacheHitVar: 'CACHE_RESTORED'
+      - task: NodeTool@0
+        displayName: 'Setup Node.js'
+        inputs:
+          versionSpec: '18.x'
+      - script: npm ci
+        displayName: 'Install Dependencies'
+      - script: npm run build
+        displayName: 'Build The Website'
+      - task: PublishBuildArtifacts@1
+        displayName: 'Save Job Artifacts'
+        inputs:
+          pathToPublish: 'dist'
+          artifactName: 'dist-files'
+          publishLocation: 'Container'
+      - script: |
+          script_file=$(find dist/assets/*.js -type f | head -n 1)
+          echo "##vso[task.setvariable variable=script-file;isOutput=true]$script_file"
+        displayName: 'Publish JS File Name'
+        name: publish
+
+  - job: Deploy
+    displayName: 'Deploy Website'
+    dependsOn: Build
+    pool:
+      vmImage: 'ubuntu-latest'
+    variables:
+      script-file: $[ dependencies.Build.outputs['publish.script-file'] ]
+    steps:
+      - task: DownloadBuildArtifacts@1
+        displayName: 'Download Build Job Artifacts'
+        inputs:
+          artifactName: 'dist-files'
+          downloadPath: '$(System.DefaultWorkingDirectory)'
+      - script: ls
+        displayName: 'Output the Content of the dist folder'
+      - script: echo "$(script-file)"
+        displayName: 'Output The File Name'
+      - script: echo "Deploying......."
+        displayName: 'Deploy'
